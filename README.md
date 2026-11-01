@@ -27,3 +27,10 @@ The trade-off: you save one pointer field per node and pay for it with stricter 
 ## The awkward edge
 
 A node carries an opaque integer `link` field whose value is `prev_token ^ next_token` (or `0` at a list end). Do not construct or compare these integers directly — they depend on internal token assignment. Use `Node.with_link(new_link)` only if you need a structural copy with a different link, and otherwise let `XorLinkedList` manage the field. `remove` raises `ValueError` if the node is not currently in *this* list (foreign nodes, already-removed nodes, and nodes with no `_ptr` all count as not-present), so you cannot safely remove a node twice.
+
+## Performance
+
+The window keeps a bounded buffer, so `push` is constant time and memory does not
+grow with the length of the stream. `peak` and `trough` are linear in the window
+size, which is the trade that keeps `push` cheap.
+
